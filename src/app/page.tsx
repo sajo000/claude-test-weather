@@ -765,70 +765,83 @@ export default function WeatherPage() {
             : "inset 0 -1px 0 rgba(255,255,255,0.8), 0 1px 0 rgba(0,0,0,0.04)",
         }}
       >
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
-          {/* 현재 위치 + 즐겨찾기 버튼 */}
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <MapPin size={13} strokeWidth={1.5} style={{ color: "#f97316", flexShrink: 0 }} />
-            <span className="text-sm font-medium truncate" style={{ color: theme.text }}>
-              {weather?.location ?? DEFAULT_LOCATION.name}
-            </span>
+        <div className="max-w-2xl mx-auto">
+          {/* 메인 행 */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* 현재 위치 + 즐겨찾기 */}
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <MapPin size={13} strokeWidth={1.5} style={{ color: "#f97316", flexShrink: 0 }} />
+              <span className="text-sm font-medium truncate" style={{ color: theme.text }}>
+                {weather?.location ?? DEFAULT_LOCATION.name}
+              </span>
+              <button
+                onClick={toggleFavorite}
+                className="flex-shrink-0 transition-transform hover:scale-110 active:scale-95"
+              >
+                <Heart
+                  size={14}
+                  strokeWidth={1.5}
+                  style={{
+                    color: isFavorite ? "#f97316" : theme.textFaint,
+                    fill: isFavorite ? "#f97316" : "none",
+                  }}
+                />
+              </button>
+            </div>
+
+            {/* 단위 토글 — 데스크탑만 (모바일은 두 번째 행) */}
+            <div className="hidden sm:flex items-center gap-1.5 flex-shrink-0">
+              <button
+                onClick={() => setUnit((u) => (u === "C" ? "F" : "C"))}
+                className="px-2.5 py-1 rounded-full text-xs font-medium transition-colors"
+                style={{ background: theme.inputBg, border: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}
+              >
+                °{unit === "C" ? "F" : "C"}
+              </button>
+              <button
+                onClick={() => setWindUnit((u) => (u === "kmh" ? "ms" : "kmh"))}
+                className="px-2.5 py-1 rounded-full text-xs font-medium transition-colors"
+                style={{ background: theme.inputBg, border: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}
+              >
+                {windUnit === "kmh" ? "m/s" : "km/h"}
+              </button>
+            </div>
+
+            {/* 현재 위치 버튼 */}
             <button
-              onClick={toggleFavorite}
-              className="flex-shrink-0 transition-transform hover:scale-110 active:scale-95"
+              onClick={handleGeolocate}
+              disabled={isGeolocating}
+              className="flex-shrink-0 p-2 rounded-full transition-colors"
+              style={{ background: theme.inputBg, border: `1px solid ${theme.cardBorder}` }}
             >
-              <Heart
-                size={14}
-                strokeWidth={1.5}
-                style={{
-                  color: isFavorite ? "#f97316" : theme.textFaint,
-                  fill: isFavorite ? "#f97316" : "none",
-                }}
-              />
+              {isGeolocating ? (
+                <Loader2 size={13} strokeWidth={1.5} className="animate-spin" style={{ color: theme.textFaint }} />
+              ) : (
+                <Navigation size={13} strokeWidth={1.5} style={{ color: theme.textMuted }} />
+              )}
             </button>
+
+            {/* 검색창 */}
+            <SearchBar theme={theme} onSelectCity={loadWeather} />
           </div>
 
-          {/* 단위 토글 그룹 */}
-          <div className="flex items-center gap-1.5 flex-shrink-0">
+          {/* 단위 토글 — 모바일 전용 두 번째 행 */}
+          <div className="flex sm:hidden items-center gap-2 mt-2">
             <button
               onClick={() => setUnit((u) => (u === "C" ? "F" : "C"))}
               className="px-2.5 py-1 rounded-full text-xs font-medium transition-colors"
-              style={{
-                background: theme.inputBg,
-                border: `1px solid ${theme.cardBorder}`,
-                color: theme.textMuted,
-              }}
+              style={{ background: theme.inputBg, border: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}
             >
               °{unit === "C" ? "F" : "C"}
             </button>
             <button
               onClick={() => setWindUnit((u) => (u === "kmh" ? "ms" : "kmh"))}
               className="px-2.5 py-1 rounded-full text-xs font-medium transition-colors"
-              style={{
-                background: theme.inputBg,
-                border: `1px solid ${theme.cardBorder}`,
-                color: theme.textMuted,
-              }}
+              style={{ background: theme.inputBg, border: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}
             >
               {windUnit === "kmh" ? "m/s" : "km/h"}
             </button>
           </div>
-
-          {/* 현재 위치 버튼 */}
-          <button
-            onClick={handleGeolocate}
-            disabled={isGeolocating}
-            className="flex-shrink-0 p-2 rounded-full transition-colors"
-            style={{ background: theme.inputBg, border: `1px solid ${theme.cardBorder}` }}
-          >
-            {isGeolocating ? (
-              <Loader2 size={13} strokeWidth={1.5} className="animate-spin" style={{ color: theme.textFaint }} />
-            ) : (
-              <Navigation size={13} strokeWidth={1.5} style={{ color: theme.textMuted }} />
-            )}
-          </button>
-
-          {/* 검색창 — 타이핑 리렌더링 격리 */}
-          <SearchBar theme={theme} onSelectCity={loadWeather} />
         </div>
 
         {/* 즐겨찾기 도시 목록 */}
@@ -890,14 +903,14 @@ export default function WeatherPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="relative z-10 max-w-2xl mx-auto px-4 pt-6 pb-12 grid grid-cols-4 gap-3"
+            className="relative z-10 max-w-2xl mx-auto px-3 sm:px-4 pt-6 pb-12 grid grid-cols-2 sm:grid-cols-4 gap-3"
           >
             {/* 현재 날씨 히어로 */}
             <motion.section
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
-              className="col-span-4 py-10 px-6 flex flex-col items-center text-center rounded-3xl relative overflow-hidden"
+              className="col-span-2 sm:col-span-4 py-8 sm:py-10 px-4 sm:px-6 flex flex-col items-center text-center rounded-3xl relative overflow-hidden"
               style={{
                 boxShadow: isDark
                   ? "0 12px 60px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.08)"
@@ -948,10 +961,10 @@ export default function WeatherPage() {
                 <div
                   className="mt-4 tabular-nums"
                   style={{
-                    fontSize: "7rem",
+                    fontSize: "clamp(4.5rem, 20vw, 7rem)",
                     fontWeight: 100,
                     lineHeight: 1,
-                    letterSpacing: "-6px",
+                    letterSpacing: "clamp(-3px, -1vw, -6px)",
                     color: theme.text,
                     textShadow: isDark ? "0 2px 16px rgba(0,0,0,0.5)" : "none",
                     fontFamily: "var(--font-montserrat), sans-serif",
@@ -970,7 +983,7 @@ export default function WeatherPage() {
             </motion.section>
 
             {/* 시간별 예보 */}
-            <WeatherCard theme={theme} delay={0.05} className="col-span-4">
+            <WeatherCard theme={theme} delay={0.05} className="col-span-2 sm:col-span-4">
               <h2 className="text-xs font-bold tracking-widest uppercase mb-4" style={{ color: theme.sectionLabel }}>
                 시간별 예보
               </h2>
@@ -1016,7 +1029,7 @@ export default function WeatherPage() {
             </WeatherCard>
 
             {/* ── 벤토 Row 2: 주간 예보 (왼쪽) + 대기질 (오른쪽) ── */}
-            <WeatherCard theme={theme} delay={0.1} className={airQuality ? "col-span-2" : "col-span-4"}>
+            <WeatherCard theme={theme} delay={0.1} className={airQuality ? "col-span-2" : "col-span-2 sm:col-span-4"}>
               <h2 className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: theme.sectionLabel }}>
                 주간 예보
               </h2>
@@ -1140,7 +1153,7 @@ export default function WeatherPage() {
       {/* 개발용 날씨 미리보기 패널 */}
       {process.env.NODE_ENV === "development" && (
         <div
-          className="fixed top-1/2 right-4 -translate-y-1/2 flex flex-col gap-2 px-3 py-2.5 rounded-2xl z-50"
+          className="hidden sm:flex fixed top-1/2 right-4 -translate-y-1/2 flex-col gap-2 px-3 py-2.5 rounded-2xl z-50"
           style={{
             background: "rgba(10,10,20,0.88)",
             border: "1px solid rgba(255,255,255,0.12)",
