@@ -5,7 +5,9 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(npx:*)",
       "Bash(mkdir -p /tmp/weather-backup)",
-      "Bash(cp CLAUDE.md DESIGN.md /tmp/weather-backup/)"
+      "Bash(cp CLAUDE.md DESIGN.md /tmp/weather-backup/)",
+      "Bash(npm install:*)",
+      "WebSearch"
     ]
   }
 }

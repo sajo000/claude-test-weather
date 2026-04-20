@@ -2,13 +2,38 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* ─── LINE Seed Sans KR — jsDelivr CDN ──────────────────────────────── */
+@font-face {
+  font-family: "LINE Seed Sans KR";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Th.woff2") format("woff2");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LINE Seed Sans KR";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Rg.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LINE Seed Sans KR";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Bd.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  /* LINE Seed KR: 기본 한국어 텍스트 / 영문 폴백은 Montserrat */
+  --font-sans: "LINE Seed Sans KR", var(--font-montserrat), sans-serif;
+  /* JetBrains Mono: 수치형 데이터 (코드처럼 읽히는 숫자들) */
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
